@@ -2,19 +2,20 @@ package com.project.management_system.service.interfaceService;
 
 import com.project.management_system.dto.request.ProductRequestDTO;
 import com.project.management_system.dto.response.ProductResponseDTO;
+import com.project.management_system.payload.ApiResponse;
 
 import java.util.List;
 
 public interface ProductService {
 
-    ProductResponseDTO createProduct(ProductRequestDTO dto);
+    ApiResponse<ProductResponseDTO> createProduct(ProductRequestDTO dto);
 
-    ProductResponseDTO updateProduct(Long id, ProductRequestDTO dto);
+    ApiResponse<ProductResponseDTO> updateProduct(Long id, ProductRequestDTO dto);
 
-    ProductResponseDTO getProductById(Long id);
+    ApiResponse<ProductResponseDTO> getProductById(Long id);
 
-    List<ProductResponseDTO> getAllProducts();
+    ApiResponse<List<ProductResponseDTO>> getAllProducts();
 
-    void deleteProduct(Long id);
+    ApiResponse<Void> deleteProduct(Long id);
 }
 

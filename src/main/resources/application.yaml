@@ -2,7 +2,7 @@ spring:
   application:
     name: management-system
   datasource:
-    url: jdbc:mysql://localhost:3306/management_system   # URL kết nối đến database
+    url: jdbc:mysql://localhost:3306/management_systemS   # URL kết nối đến database
     username: root                          # Tên đăng nhập
     password: 123456789                                 # Mật khẩu
     driver-class-name: com.mysql.cj.jdbc.Driver       # Lớp driver (thường có thể để Spring Boot tự động phát hiện)

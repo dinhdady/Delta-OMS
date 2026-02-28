@@ -2,8 +2,11 @@ package com.project.management_system.service;
 
 import com.project.management_system.dto.request.ProductRequestDTO;
 import com.project.management_system.dto.response.ProductResponseDTO;
+import com.project.management_system.exception.BadRequestException;
+import com.project.management_system.exception.ResourceNotFoundException;
 import com.project.management_system.mapper.ProductMapper;
 import com.project.management_system.model.Product;
+import com.project.management_system.payload.ApiResponse;
 import com.project.management_system.repository.CategoryRepository;
 import com.project.management_system.repository.ProductRepository;
 import com.project.management_system.repository.UnitRepository;
@@ -25,56 +28,100 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
 
     @Override
-    public ProductResponseDTO createProduct(ProductRequestDTO dto) {
+    public ApiResponse<ProductResponseDTO> createProduct(ProductRequestDTO dto) {
+
+        if (productRepository.existsBySku(dto.getSku())) {
+            throw new BadRequestException("Product SKU already exists");
+        }
 
         Product product = productMapper.toEntity(dto);
 
         product.setCategory(
                 categoryRepository.findById(dto.getCategoryId())
-                        .orElseThrow(() -> new RuntimeException("Category not found"))
+                        .orElseThrow(() -> new ResourceNotFoundException("Category not found"))
         );
 
         product.setUnit(
                 unitRepository.findById(dto.getUnitId())
-                        .orElseThrow(() -> new RuntimeException("Unit not found"))
+                        .orElseThrow(() -> new ResourceNotFoundException("Unit not found"))
         );
 
-        return productMapper.toDTO(productRepository.save(product));
+        Product savedProduct = productRepository.save(product);
+
+        return ApiResponse.<ProductResponseDTO>builder()
+                .success(true)
+                .message("Product created successfully")
+                .data(productMapper.toDTO(savedProduct))
+                .build();
     }
 
     @Override
-    public ProductResponseDTO updateProduct(Long id, ProductRequestDTO dto) {
+    public ApiResponse<ProductResponseDTO> updateProduct(Long id, ProductRequestDTO dto) {
 
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
+        // Check SKU nếu thay đổi
+        if (!product.getSku().equals(dto.getSku())
+                && productRepository.existsBySku(dto.getSku())) {
+            throw new BadRequestException("Product SKU already exists");
+        }
+
+        product.setSku(dto.getSku());
         product.setName(dto.getName());
         product.setSalePrice(dto.getSalePrice());
         product.setQuantity(dto.getQuantity());
         product.setStatus(dto.getStatus());
 
-        return productMapper.toDTO(productRepository.save(product));
+        Product updated = productRepository.save(product);
+
+        return ApiResponse.<ProductResponseDTO>builder()
+                .success(true)
+                .message("Product updated successfully")
+                .data(productMapper.toDTO(updated))
+                .build();
     }
 
     @Override
-    public ProductResponseDTO getProductById(Long id) {
-        return productMapper.toDTO(
-                productRepository.findById(id)
-                        .orElseThrow(() -> new RuntimeException("Product not found"))
-        );
+    public ApiResponse<ProductResponseDTO> getProductById(Long id) {
+
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+
+        return ApiResponse.<ProductResponseDTO>builder()
+                .success(true)
+                .message("Product retrieved successfully")
+                .data(productMapper.toDTO(product))
+                .build();
     }
 
     @Override
-    public List<ProductResponseDTO> getAllProducts() {
-        return productRepository.findAll()
+    public ApiResponse<List<ProductResponseDTO>> getAllProducts() {
+
+        List<ProductResponseDTO> products = productRepository.findAll()
                 .stream()
                 .map(productMapper::toDTO)
                 .toList();
+
+        return ApiResponse.<List<ProductResponseDTO>>builder()
+                .success(true)
+                .message("Product list retrieved successfully")
+                .data(products)
+                .build();
     }
 
     @Override
-    public void deleteProduct(Long id) {
-        productRepository.deleteById(id);
+    public ApiResponse<Void> deleteProduct(Long id) {
+
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+
+        productRepository.delete(product);
+
+        return ApiResponse.<Void>builder()
+                .success(true)
+                .message("Product deleted successfully")
+                .data(null)
+                .build();
     }
 }
-
