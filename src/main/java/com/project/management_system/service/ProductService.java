@@ -1,4 +1,4 @@
-package com.project.management_system.service.interfaceService;
+package com.project.management_system.service;
 
 import com.project.management_system.dto.request.ProductRequestDTO;
 import com.project.management_system.dto.response.ProductResponseDTO;

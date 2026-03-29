@@ -1,0 +1,161 @@
+<div class="products-section">
+  <div class="section-header">
+    <h2>Product Management</h2>
+    <button class="create-btn" (click)="openModal()">+ Add Product</button>
+  </div>
+
+  <div class="filters-bar">
+  <div class="search-wrapper">
+    <span class="search-icon">🔍</span>
+    <input
+      [(ngModel)]="search"
+      (input)="onSearch()"
+      placeholder="Search by name, SKU or category..."
+      class="search-input"
+    />
+  </div>
+
+  <div class="filter-wrapper">
+    <label>Category:</label>
+    <select [(ngModel)]="categoryFilter" (change)="onCategoryFilterChange()" class="category-filter">
+      <option value="all">All Categories</option>
+      <option *ngFor="let cat of categories" [value]="cat.name">
+        {{cat.name}}
+      </option>
+    </select>
+  </div>
+</div>
+
+  <div class="loading-overlay" *ngIf="loading">
+    <div class="spinner"></div>
+  </div>
+
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>SKU</th>
+          <th>Product Name</th>
+          <th>Category</th>
+          <th>Unit</th>
+          <th>Price</th>
+          <th>Stock</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let product of paginated">
+          <td class="product-sku">{{product.sku}}</td>
+          <td class="product-name">{{product.name}}</td>
+          <td>{{product.categoryName}}</td>
+          <td>{{product.unitName}}</td>
+          <td class="product-price">{{formatCurrency(product.salePrice)}}</td>
+          <td [class.low-stock]="product.quantity < 10">
+            {{product.quantity}}
+            <span *ngIf="product.quantity < 10" class="warning-icon">⚠️</span>
+          </td>
+          <td>
+            <span class="status-badge" [ngClass]="getStatusClass(product.status)">
+              {{product.status}}
+            </span>
+          </td>
+          <td class="actions">
+            <button class="action-btn edit" (click)="openModal(product)" title="Edit Product">
+              <span>✏️</span>
+            </button>
+            <button class="action-btn delete" (click)="deleteProduct(product.id)" title="Delete Product">
+              <span>🗑️</span>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="paginated.length === 0">
+          <td colspan="8" class="no-data">No products found</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination-wrapper" *ngIf="filteredProducts.length > 0">
+    <div class="pagination-info">
+      Showing {{(page-1)*pageSize + 1}} to {{min(page*pageSize, filteredProducts.length)}} of {{filteredProducts.length}} products
+    </div>
+    <div class="pagination-controls">
+      <button class="page-btn" [disabled]="page === 1" (click)="prevPage()">
+        ← Previous
+      </button>
+      <div class="page-numbers">
+        <button
+          *ngFor="let p of getPageNumbers()"
+          class="page-number"
+          [class.active]="p === page"
+          [class.dots]="p === -1"
+          (click)="p !== -1 && goToPage(p)">
+          {{p === -1 ? '...' : p}}
+        </button>
+      </div>
+      <button class="page-btn" [disabled]="page === totalPages" (click)="nextPage()">
+        Next →
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal" *ngIf="showModal" (click)="showModal = false">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h3>{{ editingProduct ? 'Edit Product' : 'Add New Product' }}</h3>
+
+    <div class="form-group">
+      <label>SKU *</label>
+      <input [(ngModel)]="productForm.sku" placeholder="Enter product SKU" />
+    </div>
+
+    <div class="form-group">
+      <label>Product Name *</label>
+      <input [(ngModel)]="productForm.name" placeholder="Enter product name" />
+    </div>
+
+    <div class="form-group">
+      <label>Description</label>
+      <textarea [(ngModel)]="productForm.description" rows="3" placeholder="Enter product description"></textarea>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Sale Price *</label>
+        <input type="number" [(ngModel)]="productForm.salePrice" placeholder="0" />
+      </div>
+
+      <div class="form-group">
+        <label>Quantity *</label>
+        <input type="number" [(ngModel)]="productForm.quantity" placeholder="0" />
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Category</label>
+        <select [(ngModel)]="productForm.categoryId">
+          <option [value]="null">Select Category</option>
+          <option *ngFor="let cat of categories" [value]="cat.id">
+            {{cat.name}}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Status</label>
+        <select [(ngModel)]="productForm.status">
+          <option value="ACTIVE">Active</option>
+          <option value="INACTIVE">Inactive</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="save-btn" (click)="saveProduct()">Save</button>
+      <button class="cancel-btn" (click)="showModal = false">Cancel</button>
+    </div>
+  </div>
+</div>

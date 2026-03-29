@@ -1,4 +1,4 @@
-package com.project.management_system.service.interfaceService;
+package com.project.management_system.service;
 
 import com.project.management_system.dto.request.OrderRequestDTO;
 import com.project.management_system.dto.response.OrderResponseDTO;
@@ -12,5 +12,6 @@ public interface OrderService {
     OrderResponseDTO getOrderByCode(String orderCode);
 
     List<OrderResponseDTO> getOrdersByCustomer(Long customerId);
+    List<OrderResponseDTO> getAllOrders();
 }
 

@@ -3,7 +3,7 @@ package com.project.management_system.controller;
 import com.project.management_system.dto.request.ProductRequestDTO;
 import com.project.management_system.dto.response.ProductResponseDTO;
 import com.project.management_system.payload.ApiResponse;
-import com.project.management_system.service.interfaceService.ProductService;
+import com.project.management_system.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

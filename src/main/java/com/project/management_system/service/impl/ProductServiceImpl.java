@@ -1,4 +1,4 @@
-package com.project.management_system.service;
+package com.project.management_system.service.impl;
 
 import com.project.management_system.dto.request.ProductRequestDTO;
 import com.project.management_system.dto.response.ProductResponseDTO;
@@ -10,7 +10,7 @@ import com.project.management_system.payload.ApiResponse;
 import com.project.management_system.repository.CategoryRepository;
 import com.project.management_system.repository.ProductRepository;
 import com.project.management_system.repository.UnitRepository;
-import com.project.management_system.service.interfaceService.ProductService;
+import com.project.management_system.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,7 +49,7 @@ public class ProductServiceImpl implements ProductService {
         Product savedProduct = productRepository.save(product);
 
         return ApiResponse.<ProductResponseDTO>builder()
-                .success(true)
+                .status(201)
                 .message("Product created successfully")
                 .data(productMapper.toDTO(savedProduct))
                 .build();
@@ -76,7 +76,7 @@ public class ProductServiceImpl implements ProductService {
         Product updated = productRepository.save(product);
 
         return ApiResponse.<ProductResponseDTO>builder()
-                .success(true)
+                .status(200)
                 .message("Product updated successfully")
                 .data(productMapper.toDTO(updated))
                 .build();
@@ -89,7 +89,7 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
         return ApiResponse.<ProductResponseDTO>builder()
-                .success(true)
+                .status(200)
                 .message("Product retrieved successfully")
                 .data(productMapper.toDTO(product))
                 .build();
@@ -104,7 +104,7 @@ public class ProductServiceImpl implements ProductService {
                 .toList();
 
         return ApiResponse.<List<ProductResponseDTO>>builder()
-                .success(true)
+                .status(200)
                 .message("Product list retrieved successfully")
                 .data(products)
                 .build();
@@ -119,7 +119,7 @@ public class ProductServiceImpl implements ProductService {
         productRepository.delete(product);
 
         return ApiResponse.<Void>builder()
-                .success(true)
+                .status(204)
                 .message("Product deleted successfully")
                 .data(null)
                 .build();

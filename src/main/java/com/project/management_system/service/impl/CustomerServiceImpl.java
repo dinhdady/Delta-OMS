@@ -1,4 +1,4 @@
-package com.project.management_system.service;
+package com.project.management_system.service.impl;
 
 import com.project.management_system.dto.request.CustomerRequestDTO;
 import com.project.management_system.dto.response.CustomerResponseDTO;
@@ -7,9 +7,13 @@ import com.project.management_system.model.Customer;
 import com.project.management_system.model.CustomerType;
 import com.project.management_system.repository.CustomerRepository;
 import com.project.management_system.repository.CustomerTypeRepository;
-import com.project.management_system.service.interfaceService.CustomerService;
+import com.project.management_system.service.CustomerService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -69,6 +73,14 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public void deleteCustomer(Long id) {
         customerRepository.deleteById(id);
+    }
+    @Override
+    public Page<CustomerResponseDTO> getCustomers(int page, int size, String sortBy) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+
+        return customerRepository.findAll(pageable)
+                .map(customerMapper::toDTO);
     }
 }
 

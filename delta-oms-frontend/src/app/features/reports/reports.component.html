@@ -1,0 +1,128 @@
+<div class="reports-section">
+  <div class="section-header">
+    <h2>Reports & Analytics</h2>
+    <p>Generate detailed reports to analyze your business performance</p>
+  </div>
+
+  <div class="reports-container">
+    <!-- Report Configuration -->
+    <div class="report-config">
+      <h3>Report Configuration</h3>
+
+      <div class="config-group">
+        <label>Report Type</label>
+        <div class="report-type-selector">
+          <button
+            *ngFor="let type of reportTypes"
+            class="type-btn"
+            [class.active]="reportType === type.value"
+            (click)="reportType = type.value">
+            <span class="type-icon">{{type.icon}}</span>
+            <span>{{type.label}}</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="config-group">
+        <label>Date Range</label>
+        <div class="date-range-selector">
+          <select [(ngModel)]="dateRange" class="date-select">
+            <option *ngFor="let range of dateRanges" [value]="range.value">
+              {{range.label}}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="config-group" *ngIf="dateRange === 'custom'">
+        <div class="custom-date-range">
+          <div class="date-input">
+            <label>Start Date</label>
+            <input type="date" [(ngModel)]="startDate" />
+          </div>
+          <div class="date-input">
+            <label>End Date</label>
+            <input type="date" [(ngModel)]="endDate" />
+          </div>
+        </div>
+      </div>
+
+      <button class="generate-btn" (click)="generateReport()" [disabled]="generating">
+        <span *ngIf="!generating">📊 Generate Report</span>
+        <div *ngIf="generating" class="spinner-small"></div>
+        <span *ngIf="generating"> Generating...</span>
+      </button>
+    </div>
+
+    <!-- Report Preview / Stats -->
+    <div class="report-preview">
+      <h3>Quick Stats</h3>
+
+      <div class="stats-preview">
+        <div class="stat-card-mini">
+          <div class="stat-value">{{formatCurrency(45689)}}</div>
+          <div class="stat-label">Total Revenue</div>
+        </div>
+        <div class="stat-card-mini">
+          <div class="stat-value">1,245</div>
+          <div class="stat-label">Total Orders</div>
+        </div>
+        <div class="stat-card-mini">
+          <div class="stat-value">856</div>
+          <div class="stat-label">Products</div>
+        </div>
+        <div class="stat-card-mini">
+          <div class="stat-value">342</div>
+          <div class="stat-label">Customers</div>
+        </div>
+      </div>
+
+      <div class="report-formats">
+        <h4>Available Formats</h4>
+        <div class="format-buttons">
+          <button class="format-btn">📄 PDF</button>
+          <button class="format-btn">📊 Excel</button>
+          <button class="format-btn">📋 CSV</button>
+          <button class="format-btn">🖨️ Print</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Reports -->
+  <div class="recent-reports">
+    <h3>Recently Generated Reports</h3>
+    <div class="reports-list">
+      <div class="report-item">
+        <div class="report-info">
+          <span class="report-icon">📊</span>
+          <div>
+            <div class="report-name">Sales Report - March 2024</div>
+            <div class="report-date">Generated on Mar 28, 2024</div>
+          </div>
+        </div>
+        <button class="download-btn">📥 Download</button>
+      </div>
+      <div class="report-item">
+        <div class="report-info">
+          <span class="report-icon">👥</span>
+          <div>
+            <div class="report-name">Customer Analysis Report</div>
+            <div class="report-date">Generated on Mar 25, 2024</div>
+          </div>
+        </div>
+        <button class="download-btn">📥 Download</button>
+      </div>
+      <div class="report-item">
+        <div class="report-info">
+          <span class="report-icon">📦</span>
+          <div>
+            <div class="report-name">Inventory Status Report</div>
+            <div class="report-date">Generated on Mar 20, 2024</div>
+          </div>
+        </div>
+        <button class="download-btn">📥 Download</button>
+      </div>
+    </div>
+  </div>
+</div>

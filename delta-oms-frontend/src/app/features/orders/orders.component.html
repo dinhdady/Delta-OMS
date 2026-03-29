@@ -1,0 +1,185 @@
+<div class="orders-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1>Order Management</h1>
+      <p>Manage and track customer orders</p>
+    </div>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-section">
+    <div class="search-wrapper">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        [(ngModel)]="searchCode"
+        (keyup.enter)="searchOrder()"
+        placeholder="Search by order code..."
+        class="search-input"
+      />
+      <button class="search-btn" (click)="searchOrder()">Search</button>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-overlay" *ngIf="loading">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Orders Table -->
+  <div class="table-container" *ngIf="orders.length > 0">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Order Code</th>
+          <th>Customer</th>
+          <th>Order Date</th>
+          <th>Total Amount</th>
+          <th>Final Amount</th>
+          <th>Order Status</th>
+          <th>Payment Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of orders">
+          <td>
+            <span class="code-badge">{{order.orderCode}}</span>
+          </td>
+          <td>{{order.customerName}}</td>
+          <td>{{formatDate(order.orderDate)}}</td>
+          <td>{{formatCurrency(order.totalAmount)}}</td>
+          <td class="final-amount">{{formatCurrency(order.finalAmount)}}</td>
+          <td>
+            <span class="status-badge" [class]="getStatusBadgeClass(order.orderStatus)">
+              {{order.orderStatus}}
+            </span>
+          </td>
+          <td>
+            <span class="payment-badge" [class]="getPaymentStatusClass(order.paymentStatus)">
+              {{order.paymentStatus}}
+            </span>
+          </td>
+          <td>
+            <button class="action-btn view" (click)="viewOrderDetail(order)" title="View Details">
+              👁️
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!loading && orders.length === 0">
+    <div class="empty-icon">📦</div>
+    <p>No orders found</p>
+    <small>Search by order code to view details</small>
+  </div>
+</div>
+
+<!-- Order Detail Modal -->
+<div class="modal" *ngIf="showDetailModal" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Order Details</h3>
+      <button class="close-btn" (click)="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-body" *ngIf="selectedOrder">
+      <!-- Order Info -->
+      <div class="info-section">
+        <div class="info-row">
+          <div class="info-group">
+            <label>Order Code:</label>
+            <span class="code-highlight">{{selectedOrder.orderCode}}</span>
+          </div>
+          <div class="info-group">
+            <label>Order Date:</label>
+            <span>{{formatDate(selectedOrder.orderDate)}}</span>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-group">
+            <label>Customer:</label>
+            <span>{{selectedOrder.customerName}}</span>
+          </div>
+          <div class="info-group">
+            <label>Created By:</label>
+            <span>{{selectedOrder.createdBy}}</span>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-group">
+            <label>Payment Method:</label>
+            <span>{{selectedOrder.paymentMethod}}</span>
+          </div>
+          <div class="info-group">
+            <label>Payment Status:</label>
+            <span class="payment-badge" [class]="getPaymentStatusClass(selectedOrder.paymentStatus)">
+              {{selectedOrder.paymentStatus}}
+            </span>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-group">
+            <label>Order Status:</label>
+            <span class="status-badge" [class]="getStatusBadgeClass(selectedOrder.orderStatus)">
+              {{selectedOrder.orderStatus}}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Items Table -->
+      <div class="items-section">
+        <h4>Order Items</h4>
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>Unit Price</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of selectedOrder.items">
+              <td>
+                <div class="product-info">
+                  <strong>{{item.productName}}</strong>
+                  <small>{{item.productCode}}</small>
+                </div>
+              </td>
+              <td>{{item.quantity}}</td>
+              <td>{{formatCurrency(item.unitPrice)}}</td>
+              <td class="total">{{formatCurrency(item.totalPrice)}}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3" class="text-right">Subtotal:</td>
+              <td>{{formatCurrency(selectedOrder.totalAmount)}}</td>
+            </tr>
+            <tr *ngIf="selectedOrder.discountAmount > 0">
+              <td colspan="3" class="text-right">Discount:</td>
+              <td class="discount">-{{formatCurrency(selectedOrder.discountAmount)}}</td>
+            </tr>
+            <tr class="grand-total">
+              <td colspan="3" class="text-right">Final Amount:</td>
+              <td>{{formatCurrency(selectedOrder.finalAmount)}}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-close" (click)="closeModal()">Close</button>
+    </div>
+  </div>
+</div>

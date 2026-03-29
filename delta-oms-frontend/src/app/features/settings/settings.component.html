@@ -1,0 +1,193 @@
+<div class="settings-section">
+  <div class="section-header">
+    <h2>System Settings</h2>
+    <p>Configure your application preferences and system settings</p>
+  </div>
+
+  <div class="settings-container">
+    <div class="settings-sidebar">
+      <button class="settings-tab" [class.active]="activeTab === 'general'" (click)="activeTab = 'general'">
+        <span>⚙️</span> General
+      </button>
+      <button class="settings-tab" [class.active]="activeTab === 'notifications'" (click)="activeTab = 'notifications'">
+        <span>🔔</span> Notifications
+      </button>
+      <button class="settings-tab" [class.active]="activeTab === 'appearance'" (click)="activeTab = 'appearance'">
+        <span>🎨</span> Appearance
+      </button>
+      <button class="settings-tab" [class.active]="activeTab === 'security'" (click)="activeTab = 'security'">
+        <span>🔒</span> Security
+      </button>
+    </div>
+
+    <div class="settings-content">
+      <!-- General Settings -->
+      <div *ngIf="activeTab === 'general'" class="settings-group">
+        <h3>General Settings</h3>
+
+        <div class="setting-field">
+          <label>Company Name</label>
+          <input type="text" [(ngModel)]="settings.companyName" class="setting-input" />
+        </div>
+
+        <div class="setting-field">
+          <label>Company Email</label>
+          <input type="email" [(ngModel)]="settings.companyEmail" class="setting-input" />
+        </div>
+
+        <div class="setting-field">
+          <label>Company Phone</label>
+          <input type="tel" [(ngModel)]="settings.companyPhone" class="setting-input" />
+        </div>
+
+        <div class="setting-field">
+          <label>Company Address</label>
+          <textarea [(ngModel)]="settings.companyAddress" rows="3" class="setting-input"></textarea>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-field">
+            <label>Currency</label>
+            <select [(ngModel)]="settings.currency" class="setting-select">
+              <option *ngFor="let curr of currencies" [value]="curr">{{curr}}</option>
+            </select>
+          </div>
+
+          <div class="setting-field">
+            <label>Timezone</label>
+            <select [(ngModel)]="settings.timezone" class="setting-select">
+              <option *ngFor="let tz of timezones" [value]="tz">{{tz}}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="setting-field">
+          <label>Date Format</label>
+          <select [(ngModel)]="settings.dateFormat" class="setting-select">
+            <option *ngFor="let fmt of dateFormats" [value]="fmt">{{fmt}}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Notifications Settings -->
+      <div *ngIf="activeTab === 'notifications'" class="settings-group">
+        <h3>Notification Preferences</h3>
+
+        <div class="setting-toggle">
+          <span>Email Notifications</span>
+          <label class="toggle-switch">
+            <input type="checkbox" [(ngModel)]="settings.notifications.email" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-toggle">
+          <span>Push Notifications</span>
+          <label class="toggle-switch">
+            <input type="checkbox" [(ngModel)]="settings.notifications.push" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-toggle">
+          <span>SMS Notifications</span>
+          <label class="toggle-switch">
+            <input type="checkbox" [(ngModel)]="settings.notifications.sms" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-divider"></div>
+
+        <div class="setting-toggle">
+          <span>Order Updates</span>
+          <label class="toggle-switch">
+            <input type="checkbox" [(ngModel)]="settings.notifications.orderUpdates" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-toggle">
+          <span>Inventory Alerts</span>
+          <label class="toggle-switch">
+            <input type="checkbox" [(ngModel)]="settings.notifications.inventoryAlerts" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-toggle">
+          <span>Promotional Emails</span>
+          <label class="toggle-switch">
+            <input type="checkbox" [(ngModel)]="settings.notifications.promotionalEmails" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Appearance Settings -->
+      <div *ngIf="activeTab === 'appearance'" class="settings-group">
+        <h3>Appearance Settings</h3>
+
+        <div class="setting-toggle">
+          <span>Dark Mode</span>
+          <label class="toggle-switch">
+            <input type="checkbox" [(ngModel)]="settings.appearance.darkMode" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-toggle">
+          <span>Compact Mode (Reduce spacing)</span>
+          <label class="toggle-switch">
+            <input type="checkbox" [(ngModel)]="settings.appearance.compactMode" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-toggle">
+          <span>Enable Animations</span>
+          <label class="toggle-switch">
+            <input type="checkbox" [(ngModel)]="settings.appearance.animations" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Security Settings -->
+      <div *ngIf="activeTab === 'security'" class="settings-group">
+        <h3>Security Settings</h3>
+
+        <div class="setting-toggle">
+          <span>Two-Factor Authentication (2FA)</span>
+          <label class="toggle-switch">
+            <input type="checkbox" [(ngModel)]="settings.security.twoFactorAuth" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-field">
+          <label>Session Timeout (minutes)</label>
+          <input type="number" [(ngModel)]="settings.security.sessionTimeout" class="setting-input" />
+        </div>
+
+        <div class="setting-field">
+          <label>Password Expiry (days)</label>
+          <input type="number" [(ngModel)]="settings.security.passwordExpiryDays" class="setting-input" />
+        </div>
+
+        <button class="change-password-btn" (click)="changePassword()">
+          🔑 Change Password
+        </button>
+      </div>
+
+      <div class="settings-actions">
+        <button class="save-btn" (click)="saveSettings()" [disabled]="saving">
+          <span *ngIf="!saving">💾 Save Changes</span>
+          <div *ngIf="saving" class="spinner-small"></div>
+          <span *ngIf="saving"> Saving...</span>
+        </button>
+        <button class="reset-btn" (click)="resetSettings()">↺ Reset to Default</button>
+      </div>
+    </div>
+  </div>
+</div>

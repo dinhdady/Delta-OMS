@@ -1,0 +1,130 @@
+<!-- LOADING SPINNER -->
+<div class="loading-overlay" *ngIf="loading">
+  <div class="spinner"></div>
+</div>
+
+<!-- HEADER -->
+<header class="main-header">
+  <div class="header-title">
+    <h1>Dashboard</h1>
+    <p>Welcome back, {{username}}! Here's what's happening with your sports equipment store.</p>
+  </div>
+  <div class="header-actions">
+    <div class="notification-badge">
+      <span class="bell-icon">🔔</span>
+      <span class="badge">3</span>
+    </div>
+    <div class="date-display">
+      <span>📅</span>
+      <span>{{currentDate | date:'fullDate'}}</span>
+    </div>
+  </div>
+</header>
+
+<!-- STATS CARDS -->
+<div class="stats-grid">
+  <div class="stat-card customers">
+    <div class="stat-icon">👥</div>
+    <div class="stat-info">
+      <h3>{{stats.totalCustomers | number}}</h3>
+      <p>Total Customers</p>
+      <span class="stat-trend positive">+12% this month</span>
+    </div>
+  </div>
+
+  <div class="stat-card orders">
+    <div class="stat-icon">📦</div>
+    <div class="stat-info">
+      <h3>{{stats.totalOrders | number}}</h3>
+      <p>Total Orders</p>
+      <span class="stat-trend positive">+8% this month</span>
+    </div>
+  </div>
+
+  <div class="stat-card products">
+    <div class="stat-icon">⚽</div>
+    <div class="stat-info">
+      <h3>{{stats.totalProducts | number}}</h3>
+      <p>Total Products</p>
+      <span class="stat-trend neutral">Stable</span>
+    </div>
+  </div>
+
+  <div class="stat-card revenue">
+    <div class="stat-icon">💰</div>
+    <div class="stat-info">
+      <h3>{{formatCurrency(stats.totalRevenue)}}</h3>
+      <p>Total Revenue</p>
+      <span class="stat-trend positive">+23% this month</span>
+    </div>
+  </div>
+</div>
+
+<!-- CHART SECTION -->
+<div class="chart-section">
+  <div class="section-header">
+    <h2>Sales Overview</h2>
+    <select class="chart-filter" (change)="onChartFilterChange($any($event.target).value)">
+      <option value="7">Last 7 days</option>
+      <option value="30">Last 30 days</option>
+      <option value="90">Last 3 months</option>
+      <option value="365">This year</option>
+    </select>
+  </div>
+  <div class="chart-container">
+    <canvas id="salesChart"></canvas>
+  </div>
+</div>
+
+<!-- TWO COLUMNS -->
+<div class="two-columns">
+  <!-- Recent Orders -->
+  <div class="recent-orders">
+    <div class="section-header">
+      <h2>Recent Orders</h2>
+      <a href="#" class="view-all" (click)="navigateTo('orders'); $event.preventDefault()">View All →</a>
+    </div>
+    <div class="orders-list">
+      <div class="order-item" *ngFor="let order of recentOrders" (click)="viewOrder(order)">
+        <div class="order-info">
+          <div class="order-number">{{order.orderCode}}</div>
+          <div class="order-customer">{{order.customerName}}</div>
+        </div>
+        <div class="order-details">
+          <div class="order-total">{{formatCurrency(order.finalAmount)}}</div>
+          <div class="order-status" [ngClass]="getStatusClass(order.orderStatus)">
+            {{order.orderStatus}}
+          </div>
+        </div>
+      </div>
+      <div *ngIf="recentOrders.length === 0" class="empty-state">
+        No recent orders found
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Products -->
+  <div class="top-products">
+    <div class="section-header">
+      <h2>Top Products</h2>
+      <a href="#" class="view-all" (click)="navigateTo('products'); $event.preventDefault()">View All →</a>
+    </div>
+    <div class="products-list">
+      <div class="product-item" *ngFor="let product of topProducts">
+        <div class="product-info">
+          <div class="product-name">{{product.name}}</div>
+          <div class="product-category">{{product.categoryName}}</div>
+        </div>
+        <div class="product-stats">
+          <div class="product-price">{{formatCurrency(product.salePrice)}}</div>
+          <div class="product-stock" [class.low-stock]="product.quantity < 10">
+            {{product.quantity}} in stock
+          </div>
+        </div>
+      </div>
+      <div *ngIf="topProducts.length === 0" class="empty-state">
+        No products found
+      </div>
+    </div>
+  </div>
+</div>
