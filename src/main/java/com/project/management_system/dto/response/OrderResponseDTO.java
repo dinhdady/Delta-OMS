@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 public class OrderResponseDTO {
-
+    private Long id;
     private String orderCode;
     private LocalDateTime orderDate;
 

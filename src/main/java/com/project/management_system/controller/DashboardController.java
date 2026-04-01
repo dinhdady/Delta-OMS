@@ -39,9 +39,11 @@ public class DashboardController {
         return ResponseEntity.ok(dashboardService.getTopProducts());
     }
 
+    // Sửa: Thêm param days và trả về cấu trúc phù hợp với frontend
     @GetMapping("/sales/chart")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> getSalesChart() {
-        return ResponseEntity.ok(dashboardService.getSalesChart());
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getSalesChart(
+            @RequestParam(defaultValue = "7") int days) {
+        return ResponseEntity.ok(dashboardService.getSalesChart(days));
     }
 
     @DeleteMapping("/customers/{id}")

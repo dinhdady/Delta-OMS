@@ -88,7 +88,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new RuntimeException("Username already exists");
         }
 
-        Role role = roleRepository.findByName("ADMIN")
+        Role role = roleRepository.findByName("STAFF")
                 .orElseThrow(() -> new RuntimeException("Default role not found"));
 
         User user = new User();

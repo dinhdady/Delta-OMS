@@ -19,6 +19,7 @@
         class="search-input"
       />
       <button class="search-btn" (click)="searchOrder()">Search</button>
+      <button class="clear-btn" *ngIf="searchCode" (click)="searchCode = ''; searchOrder()" title="Clear">✕</button>
     </div>
   </div>
 
@@ -28,7 +29,7 @@
   </div>
 
   <!-- Orders Table -->
-  <div class="table-container" *ngIf="orders.length > 0">
+  <div class="table-container" *ngIf="orders && orders.length > 0">
     <table class="data-table">
       <thead>
         <tr>
@@ -43,7 +44,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let order of orders">
+        <tr *ngFor="let order of paginated">
           <td>
             <span class="code-badge">{{order.orderCode}}</span>
           </td>
@@ -72,12 +73,38 @@
   </div>
 
   <!-- Empty State -->
-  <div class="empty-state" *ngIf="!loading && orders.length === 0">
+  <div class="empty-state" *ngIf="!loading && filteredOrders.length === 0">
     <div class="empty-icon">📦</div>
     <p>No orders found</p>
     <small>Search by order code to view details</small>
   </div>
+
+  <!-- Pagination -->
+  <div class="pagination-wrapper" *ngIf="filteredOrders.length > 0">
+    <div class="pagination-controls">
+      <button class="page-btn" [disabled]="page === 1" (click)="prevPage()">← Previous</button>
+      <div class="page-numbers">
+        <button
+          *ngFor="let p of getPageNumbers()"
+          class="page-number"
+          [class.active]="p === page"
+          [class.dots]="p === -1"
+          (click)="p !== -1 && goToPage(p)">
+          {{p === -1 ? '...' : p}}
+        </button>
+      </div>
+      <button class="page-btn" [disabled]="page === totalPages" (click)="nextPage()">Next →</button>
+    </div>
+  </div>
 </div>
+
+<!-- Order Detail Modal -->
+<div class="modal" *ngIf="showDetailModal" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <!-- Modal content... -->
+  </div>
+</div>
+
 
 <!-- Order Detail Modal -->
 <div class="modal" *ngIf="showDetailModal" (click)="closeModal()">
@@ -140,39 +167,39 @@
         <h4>Order Items</h4>
         <table class="items-table">
           <thead>
-            <tr>
-              <th>Product</th>
-              <th>Quantity</th>
-              <th>Unit Price</th>
-              <th>Total</th>
-            </tr>
+          <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Unit Price</th>
+            <th>Total</th>
+          </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let item of selectedOrder.items">
-              <td>
-                <div class="product-info">
-                  <strong>{{item.productName}}</strong>
-                  <small>{{item.productCode}}</small>
-                </div>
-              </td>
-              <td>{{item.quantity}}</td>
-              <td>{{formatCurrency(item.unitPrice)}}</td>
-              <td class="total">{{formatCurrency(item.totalPrice)}}</td>
-            </tr>
+          <tr *ngFor="let item of selectedOrder.items">
+            <td>
+              <div class="product-info">
+                <strong>{{item.productName}}</strong>
+                <small>{{item.productCode}}</small>
+              </div>
+            </td>
+            <td>{{item.quantity}}</td>
+            <td>{{formatCurrency(item.unitPrice)}}</td>
+            <td class="total">{{formatCurrency(item.totalPrice)}}</td>
+          </tr>
           </tbody>
           <tfoot>
-            <tr>
-              <td colspan="3" class="text-right">Subtotal:</td>
-              <td>{{formatCurrency(selectedOrder.totalAmount)}}</td>
-            </tr>
-            <tr *ngIf="selectedOrder.discountAmount > 0">
-              <td colspan="3" class="text-right">Discount:</td>
-              <td class="discount">-{{formatCurrency(selectedOrder.discountAmount)}}</td>
-            </tr>
-            <tr class="grand-total">
-              <td colspan="3" class="text-right">Final Amount:</td>
-              <td>{{formatCurrency(selectedOrder.finalAmount)}}</td>
-            </tr>
+          <tr>
+            <td colspan="3" class="text-right">Subtotal:</td>
+            <td>{{formatCurrency(selectedOrder.totalAmount)}}</td>
+          </tr>
+          <tr *ngIf="selectedOrder.discountAmount > 0">
+            <td colspan="3" class="text-right">Discount:</td>
+            <td class="discount">-{{formatCurrency(selectedOrder.discountAmount)}}</td>
+          </tr>
+          <tr class="grand-total">
+            <td colspan="3" class="text-right">Final Amount:</td>
+            <td>{{formatCurrency(selectedOrder.finalAmount)}}</td>
+          </tr>
           </tfoot>
         </table>
       </div>

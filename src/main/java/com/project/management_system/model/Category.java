@@ -1,5 +1,6 @@
 package com.project.management_system.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,10 +16,10 @@ public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @Column(nullable = false, unique = true)
     private String name;
     private String description;
-
+    @JsonIgnore
     @OneToMany(mappedBy = "category")
     private List<Product> products;
 }

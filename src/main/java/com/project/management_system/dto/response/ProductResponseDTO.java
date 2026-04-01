@@ -1,5 +1,6 @@
 package com.project.management_system.dto.response;
 
+import com.project.management_system.model.Product;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,7 +16,7 @@ public class ProductResponseDTO {
     private String description;
     private BigDecimal salePrice;
     private int quantity;
-    private String status;
+    private Product.ProductStatus status;
     private String categoryName;
     private String unitName;
 }

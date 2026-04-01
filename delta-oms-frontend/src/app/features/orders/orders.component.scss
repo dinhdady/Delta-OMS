@@ -1,382 +1,679 @@
+// orders.component.scss
+// Design system: consistent với products, customers, dashboard, login
+
 .orders-container {
-  padding: 0;
+  padding: 24px;
+  background: #f8f9fa;
+  min-height: 100vh;
 
+  // ── Page Header ────────────────────────────────────────
   .page-header {
-    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #e9ecef;
 
-    h1 {
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: #1e3c72;
-      margin: 0 0 0.5rem 0;
-    }
+    .header-left {
+      h1 {
+        margin: 0 0 4px 0;
+        font-size: 24px;
+        font-weight: 600; // Đổi từ 700 xuống 600 để giống products
+        color: #1e293b;
+        letter-spacing: -0.5px;
+      }
 
-    p {
-      color: #6c757d;
-      margin: 0;
-      font-size: 0.9rem;
+      p {
+        margin: 0;
+        font-size: 14px;
+        color: #64748b;
+      }
     }
   }
 
+  // ── Search Section ─────────────────────────────────────
   .search-section {
-    margin-bottom: 1.5rem;
+    margin-bottom: 24px;
 
     .search-wrapper {
       display: flex;
-      gap: 1rem;
-      max-width: 500px;
+      align-items: center;
+      gap: 10px;
+      max-width: 520px;
+      position: relative;
 
       .search-icon {
         position: absolute;
-        left: 1rem;
+        left: 12px;
         top: 50%;
         transform: translateY(-50%);
+        font-size: 16px; // Tăng từ 15 lên 16
+        color: #94a3b8;
+        pointer-events: none;
       }
 
       .search-input {
         flex: 1;
-        padding: 0.75rem 1rem;
-        border: 2px solid #e9ecef;
-        border-radius: 12px;
-        font-size: 0.9rem;
-        transition: all 0.3s ease;
+        padding: 10px 14px 10px 36px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 14px;
+        color: #1e293b;
+        background: white;
+        transition: all 0.3s ease; // Đổi từ 0.2s thành 0.3s
+        box-sizing: border-box;
 
         &:focus {
           outline: none;
-          border-color: #667eea;
-          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        &::placeholder {
+          color: #94a3b8;
         }
       }
 
       .search-btn {
-        padding: 0.75rem 1.5rem;
-        background: linear-gradient(135deg, #667eea, #764ba2);
+        padding: 10px 24px; // Tăng từ 10px 20px lên 10px 24px
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
         color: white;
         border: none;
-        border-radius: 12px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
         cursor: pointer;
-        font-weight: 600;
         transition: all 0.3s ease;
+        white-space: nowrap;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
         &:hover {
           transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+          box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+          background: linear-gradient(135deg, #2563eb, #1d4ed8);
         }
-      }
-    }
-  }
 
-  .table-container {
-    background: white;
-    border-radius: 20px;
-    overflow-x: auto;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 900px;
-
-      thead {
-        background: #f8f9fa;
-
-        th {
-          padding: 1rem;
-          text-align: left;
-          font-weight: 600;
-          color: #495057;
-          font-size: 0.85rem;
-          text-transform: uppercase;
+        &:active {
+          transform: translateY(0);
         }
       }
 
-      tbody {
-        tr {
-          border-bottom: 1px solid #f0f0f0;
-          transition: all 0.3s ease;
-
-          &:hover {
-            background: #f8f9fa;
-          }
-
-          td {
-            padding: 1rem;
-            color: #6c757d;
-            font-size: 0.9rem;
-          }
-        }
-      }
-
-      .code-badge {
-        display: inline-block;
-        padding: 0.25rem 0.5rem;
-        background: #e3f2fd;
-        color: #1976d2;
-        border-radius: 6px;
-        font-family: monospace;
-        font-size: 0.8rem;
-        font-weight: 600;
-      }
-
-      .final-amount {
-        font-weight: 600;
-        color: #2c3e50;
-      }
-
-      .status-badge, .payment-badge {
-        display: inline-block;
-        padding: 0.25rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 500;
-      }
-
-      .status-pending { background: #fff3cd; color: #856404; }
-      .status-processing { background: #cce5ff; color: #004085; }
-      .status-completed { background: #d4edda; color: #155724; }
-      .status-cancelled { background: #f8d7da; color: #721c24; }
-
-      .payment-paid { background: #d4edda; color: #155724; }
-      .payment-unpaid { background: #f8d7da; color: #721c24; }
-      .payment-refunded { background: #e2e3e5; color: #383d41; }
-
-      .action-btn {
-        width: 32px;
-        height: 32px;
+      .clear-btn {
+        position: absolute;
+        right: 110px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: transparent;
         border: none;
-        border-radius: 8px;
+        color: #94a3b8;
         cursor: pointer;
-        transition: all 0.3s ease;
-        background: #e3f2fd;
+        font-size: 13px;
+        padding: 4px 6px;
+        line-height: 1;
+        transition: color 0.2s;
 
         &:hover {
-          background: #1976d2;
-          color: white;
-          transform: scale(1.1);
+          color: #475569;
         }
       }
     }
   }
 
-  .empty-state {
-    text-align: center;
-    padding: 3rem;
-    background: white;
-    border-radius: 20px;
-
-    .empty-icon {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-    }
-
-    p {
-      color: #6c757d;
-      margin-bottom: 0.5rem;
-    }
-
-    small {
-      color: #adb5bd;
-    }
-  }
-
-  // Modal Styles
-  .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-
-    .modal-content {
-      background: white;
-      border-radius: 20px;
-      width: 90%;
-      max-width: 800px;
-      max-height: 90vh;
-      overflow-y: auto;
-      animation: slideUp 0.3s ease;
-
-      .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1.5rem 2rem;
-        border-bottom: 1px solid #e9ecef;
-
-        h3 {
-          font-size: 1.25rem;
-          font-weight: 600;
-          color: #2c3e50;
-          margin: 0;
-        }
-
-        .close-btn {
-          background: none;
-          border: none;
-          font-size: 1.25rem;
-          cursor: pointer;
-          color: #6c757d;
-
-          &:hover {
-            color: #dc3545;
-          }
-        }
-      }
-
-      .modal-body {
-        padding: 1.5rem 2rem;
-
-        .info-section {
-          background: #f8f9fa;
-          padding: 1rem;
-          border-radius: 12px;
-          margin-bottom: 1.5rem;
-
-          .info-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 1rem;
-
-            &:last-child {
-              margin-bottom: 0;
-            }
-          }
-
-          .info-group {
-            label {
-              font-weight: 600;
-              color: #495057;
-              margin-right: 0.5rem;
-            }
-
-            .code-highlight {
-              font-family: monospace;
-              font-weight: 600;
-              color: #1976d2;
-            }
-          }
-        }
-
-        .items-section {
-          h4 {
-            margin-bottom: 1rem;
-            color: #2c3e50;
-          }
-
-          .items-table {
-            width: 100%;
-            border-collapse: collapse;
-
-            thead th {
-              text-align: left;
-              padding: 0.75rem;
-              background: #f8f9fa;
-              font-weight: 600;
-              color: #495057;
-            }
-
-            tbody td {
-              padding: 0.75rem;
-              border-bottom: 1px solid #e9ecef;
-            }
-
-            tfoot td {
-              padding: 0.75rem;
-              font-weight: 500;
-            }
-
-            .product-info {
-              display: flex;
-              flex-direction: column;
-
-              small {
-                font-size: 0.7rem;
-                color: #6c757d;
-              }
-            }
-
-            .text-right {
-              text-align: right;
-            }
-
-            .discount {
-              color: #dc3545;
-            }
-
-            .grand-total {
-              font-size: 1.1rem;
-              font-weight: 700;
-              color: #2c3e50;
-              border-top: 2px solid #e9ecef;
-            }
-          }
-        }
-      }
-
-      .modal-footer {
-        padding: 1.5rem 2rem;
-        border-top: 1px solid #e9ecef;
-        display: flex;
-        justify-content: flex-end;
-
-        .btn-close {
-          padding: 0.75rem 1.5rem;
-          background: #e9ecef;
-          color: #6c757d;
-          border: none;
-          border-radius: 12px;
-          cursor: pointer;
-          font-weight: 600;
-
-          &:hover {
-            background: #dee2e6;
-          }
-        }
-      }
-    }
-  }
-
+  // ── Loading Overlay ────────────────────────────────────
   .loading-overlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(0, 0, 0, 0.5); // Đổi từ rgba(248, 249, 250, 0.85) thành rgba(0,0,0,0.5) để giống products
+    backdrop-filter: blur(2px);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 999;
+    z-index: 1000;
 
     .spinner {
-      width: 50px;
-      height: 50px;
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #667eea;
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3; // Đổi từ 3px thành 4px
+      border-top: 4px solid #3b82f6; // Đổi từ 3px thành 4px
       border-radius: 50%;
-      animation: spin 1s linear infinite;
+      animation: spin 1s linear infinite; // Đổi từ 0.8s thành 1s
+    }
+  }
+
+  // ── Table Container ────────────────────────────────────
+  .table-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); // Đổi từ 0.08 thành 0.1
+    border: 1px solid #f1f5f9;
+    overflow-x: auto;
+    margin-bottom: 24px;
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 860px;
+
+      thead {
+        background: #f8fafc;
+        border-bottom: 2px solid #e2e8f0;
+
+        th {
+          padding: 16px 12px; // Đổi từ 14px thành 16px 12px để giống products
+          text-align: left;
+          font-size: 13px; // Đổi từ 12px thành 13px
+          font-weight: 600;
+          color: #475569;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+
+          &:last-child {
+            text-align: center;
+          }
+        }
+      }
+
+      tbody {
+        tr {
+          border-bottom: 1px solid #f1f5f9;
+          transition: background 0.2s ease; // Đổi từ 0.15s thành 0.2s
+
+          &:last-child {
+            border-bottom: none;
+          }
+
+          &:hover {
+            background: #f8fafc;
+          }
+
+          td {
+            padding: 16px 12px; // Đổi từ 14px thành 16px 12px
+            font-size: 14px;
+            color: #1e293b;
+            vertical-align: middle;
+          }
+        }
+      }
+
+      .code-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        background: #eff6ff;
+        color: #3b82f6;
+        border-radius: 6px;
+        font-family: monospace;
+        font-size: 13px; // Đổi từ 12px thành 13px
+        font-weight: 500; // Đổi từ 600 thành 500
+        letter-spacing: 0.3px;
+      }
+
+      .final-amount {
+        font-weight: 700;
+        color: #10b981;
+      }
+
+      .status-badge,
+      .payment-badge {
+        display: inline-block;
+        padding: 4px 12px; // Đổi từ 3px 10px thành 4px 12px
+        border-radius: 20px;
+        font-size: 12px; // Đổi từ 11px thành 12px
+        font-weight: 500; // Đổi từ 600 thành 500
+      }
+
+      .status-pending    { background: #fef9c3; color: #854d0e; }
+      .status-processing { background: #dbeafe; color: #1e40af; }
+      .status-completed  { background: #d1fae5; color: #065f46; } // Đổi màu giống products
+      .status-cancelled  { background: #fee2e2; color: #991b1b; }
+      .status-default    { background: #f1f5f9; color: #475569; }
+
+      .payment-paid      { background: #d1fae5; color: #065f46; } // Đổi màu
+      .payment-unpaid    { background: #fee2e2; color: #991b1b; }
+      .payment-refunded  { background: #f1f5f9; color: #475569; }
+      .payment-default   { background: #f1f5f9; color: #475569; }
+
+      td:last-child {
+        text-align: center;
+      }
+
+      .action-btn {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.2s ease;
+
+        &.view {
+          background: #3b82f6; // Đổi từ #eff6ff thành #3b82f6
+          color: white; // Đổi từ #3b82f6 thành white
+
+          &:hover {
+            background: #2563eb; // Đổi từ #3b82f6 thành #2563eb
+            color: white;
+            transform: scale(1.05);
+          }
+        }
+      }
+    }
+  }
+
+  // ── Pagination ─────────────────────────────────────────
+  .pagination-wrapper {
+    display: block;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 16px 0;
+    right: 9px;;
+    .pagination-info {
+      font-size: 14px;
+      color: #64748b;
+    }
+
+    .pagination-controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+
+      .page-btn {
+        padding: 8px 16px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        color: #475569;
+        transition: all 0.2s ease;
+
+        &:hover:not(:disabled) {
+          background: #f1f5f9;
+          border-color: #cbd5e1;
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
+
+      .page-numbers {
+        display: flex;
+        gap: 4px;
+
+        .page-number {
+          min-width: 36px;
+          height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: white;
+          border: 1px solid #e2e8f0;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 14px;
+          color: #475569;
+          transition: all 0.2s ease;
+
+          &:hover:not(.dots) {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+          }
+
+          &.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+          }
+
+          &.dots {
+            cursor: default;
+            border: none;
+            background: transparent;
+
+            &:hover {
+              background: transparent;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // ── Empty State ────────────────────────────────────────
+  .empty-state {
+    text-align: center;
+    padding: 56px 24px;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+
+    .empty-icon {
+      font-size: 44px;
+      margin-bottom: 14px;
+    }
+
+    p {
+      font-size: 15px;
+      font-weight: 500;
+      color: #475569;
+      margin: 0 0 6px 0;
+    }
+
+    small {
+      font-size: 13px;
+      color: #94a3b8;
     }
   }
 }
 
+// ── Modal Styles (giữ nguyên nhưng thêm style từ products) ──
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1001;
+  animation: fadeIn 0.3s ease; // Đổi từ 0.25s thành 0.3s
+
+  .modal-content {
+    background: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 760px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid #e2e8f0;
+      position: sticky;
+      top: 0;
+      background: white;
+      z-index: 1;
+      border-radius: 12px 12px 0 0;
+
+      h3 {
+        font-size: 18px; // Đổi từ 17px thành 18px
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+      }
+
+      .close-btn {
+        background: transparent;
+        border: none;
+        font-size: 18px; // Đổi từ 17px thành 18px
+        color: #94a3b8;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 6px;
+        line-height: 1;
+        transition: all 0.2s ease;
+
+        &:hover {
+          color: #475569;
+          background: #f1f5f9;
+        }
+      }
+    }
+
+    .modal-body {
+      padding: 20px 24px;
+
+      .info-section {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 16px 20px;
+        margin-bottom: 20px;
+
+        .info-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px 24px;
+          margin-bottom: 12px;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+        }
+
+        .info-group {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-wrap: wrap;
+
+          label {
+            font-size: 13px; // Đổi từ 12px thành 13px
+            font-weight: 500; // Đổi từ 600 thành 500
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            white-space: nowrap;
+          }
+
+          span {
+            font-size: 14px;
+            color: #1e293b;
+            font-weight: 500;
+          }
+
+          .code-highlight {
+            font-family: monospace;
+            font-weight: 700;
+            color: #3b82f6;
+            background: #eff6ff;
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-size: 13px;
+          }
+        }
+      }
+
+      .items-section {
+        h4 {
+          font-size: 13px;
+          font-weight: 600;
+          color: #475569;
+          margin: 0 0 12px 0;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .items-table {
+          width: 100%;
+          border-collapse: collapse;
+          border: 1px solid #e2e8f0;
+          border-radius: 8px;
+          overflow: hidden;
+
+          thead th {
+            text-align: left;
+            padding: 11px 14px;
+            background: #f8fafc;
+            font-size: 12px;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            border-bottom: 1px solid #e2e8f0;
+          }
+
+          tbody td {
+            padding: 12px 14px;
+            font-size: 14px;
+            color: #1e293b;
+            border-bottom: 1px solid #f1f5f9;
+          }
+
+          tfoot td {
+            padding: 10px 14px;
+            font-size: 14px;
+            color: #475569;
+          }
+
+          .text-right {
+            text-align: right;
+            font-weight: 500;
+          }
+
+          .discount {
+            color: #ef4444;
+            font-weight: 600;
+          }
+
+          tr.grand-total td {
+            border-top: 2px solid #e2e8f0;
+            font-size: 15px;
+            font-weight: 700;
+            color: #1e293b;
+          }
+
+          .product-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+
+            strong {
+              font-weight: 600;
+              font-size: 14px;
+            }
+
+            small {
+              font-size: 11px;
+              color: #94a3b8;
+              font-family: monospace;
+            }
+          }
+
+          .total {
+            font-weight: 700;
+            color: #10b981;
+          }
+        }
+      }
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      padding: 16px 24px 20px;
+      border-top: 1px solid #e2e8f0;
+
+      .btn-close {
+        padding: 10px 24px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        color: #475569;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: #f8fafc;
+          border-color: #cbd5e1;
+        }
+      }
+    }
+  }
+}
+
+// ── Animations ────────────────────────────────────────────
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+// ── Responsive ────────────────────────────────────────────
+@media (max-width: 768px) {
+  .orders-container {
+    padding: 16px;
+
+    .page-header {
+      flex-direction: column;
+      gap: 16px;
+      align-items: stretch;
+
+      .header-left {
+        text-align: center;
+      }
+    }
+
+    .search-section .search-wrapper {
+      max-width: 100%;
+    }
+
+    .pagination-wrapper {
+      flex-direction: column;
+      align-items: center;
+
+      .pagination-controls {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+    }
+  }
+
+  .modal .modal-content {
+    width: 95%;
+
+    .modal-body .info-section .info-row {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+// ── Scrollbar ─────────────────────────────────────────────
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+
+  &:hover {
+    background: #94a3b8;
   }
 }

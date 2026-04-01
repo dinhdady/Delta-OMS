@@ -11,13 +11,15 @@ import java.util.Map;
 public interface DashboardService {
 
     ApiResponse<Map<String, Object>> getStatistics();
+
     ApiResponse<List<CustomerResponseDTO>> getCustomers();
 
     ApiResponse<List<OrderResponseDTO>> getRecentOrders();
 
     ApiResponse<List<ProductResponseDTO>> getTopProducts();
 
-    ApiResponse<Map<String, Object>> getSalesChart();
+    // Thêm param days
+    ApiResponse<Map<String, Object>> getSalesChart(int days);
 
     ApiResponse<Void> deleteCustomer(Long id);
 }

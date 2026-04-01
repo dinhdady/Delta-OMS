@@ -18,7 +18,11 @@ export class OrderService {
       withCredentials: true
     });
   }
-
+  getAllOrders(): Observable<any[]> {
+    return this.http.get<any[]>(this.apiUrl, {
+      withCredentials: true
+    });
+  }
   getOrderByCode(orderCode: string): Observable<OrderResponse> {
     return this.http.get<OrderResponse>(`${this.apiUrl}/${orderCode}`, {
       withCredentials: true

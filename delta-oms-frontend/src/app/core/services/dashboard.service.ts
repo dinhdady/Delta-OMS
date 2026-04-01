@@ -12,18 +12,6 @@ export interface CustomerRequestDTO {
   customerTypeId: number;
 }
 
-export interface ProductRequestDTO {
-  sku: string;
-  name: string;
-  description: string;
-  importPrice: number;
-  salePrice: number;
-  quantity: number;
-  status: string;
-  categoryId: number;
-  unitId: number;
-}
-
 export interface OrderRequestDTO {
   customerId: number;
   paymentMethodId: number;
@@ -53,12 +41,32 @@ export interface ProductResponseDTO {
   id: number;
   sku: string;
   name: string;
-  description: string;
+  description?: string;
+  importPrice?: number;
   salePrice: number;
   quantity: number;
   status: string;
-  categoryName: string;
-  unitName: string;
+  categoryId?: number;
+  categoryName?: string;
+  unitId?: number;
+  unitName?: string;
+  deleted?: boolean;
+  deletedAt?: string;
+  deletedBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ProductRequestDTO {
+  sku: string;
+  name: string;
+  description?: string;
+  importPrice?: number;
+  salePrice: number;
+  quantity: number;
+  status: string;
+  categoryId: number;
+  unitId: number;
 }
 
 export interface OrderResponseDTO {
@@ -86,6 +94,7 @@ export interface OrderItemResponseDTO {
 export interface CategoryResponseDTO {
   id: number;
   name: string;
+  description?: string;
 }
 
 export interface StatisticsResponse {
@@ -178,6 +187,25 @@ export class DashboardService {
     });
   }
 
+  // Soft delete operations
+  restoreProduct(id: number): Observable<ApiResponse<void>> {
+    return this.http.put<ApiResponse<void>>(`${this.apiUrl}/products/${id}/restore`, {}, {
+      withCredentials: true
+    });
+  }
+
+  getAllProductsIncludingDeleted(): Observable<ApiResponse<ProductResponseDTO[]>> {
+    return this.http.get<ApiResponse<ProductResponseDTO[]>>(`${this.apiUrl}/products/all`, {
+      withCredentials: true
+    });
+  }
+
+  permanentlyDeleteProduct(id: number): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/products/${id}/permanent`, {
+      withCredentials: true
+    });
+  }
+
   // Orders
   getOrders(): Observable<ApiResponse<OrderResponseDTO[]>> {
     return this.http.get<ApiResponse<OrderResponseDTO[]>>(`${this.apiUrl}/orders`, {
@@ -209,31 +237,25 @@ export class DashboardService {
     });
   }
 
-  // Categories
-  getCategories(): Observable<ApiResponse<CategoryResponseDTO[]>> {
-    return this.http.get<ApiResponse<CategoryResponseDTO[]>>(`${this.apiUrl}/categories`, {
-      withCredentials: true
-    });
+  getRecentOrders(limit: number = 5): Observable<ApiResponse<any[]>> {
+    return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/dashboard/orders/recent`);
   }
 
-  // Recent Orders for Dashboard
-  getRecentOrders(limit: number = 5): Observable<ApiResponse<OrderResponseDTO[]>> {
-    return this.http.get<ApiResponse<OrderResponseDTO[]>>(`${this.apiUrl}/orders/recent?limit=${limit}`, {
-      withCredentials: true
-    });
+  getTopProducts(limit: number = 5): Observable<ApiResponse<any[]>> {
+    return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/dashboard/products/top`);
   }
 
-  // Top Products for Dashboard
-  getTopProducts(limit: number = 5): Observable<ApiResponse<ProductResponseDTO[]>> {
-    return this.http.get<ApiResponse<ProductResponseDTO[]>>(`${this.apiUrl}/products/top?limit=${limit}`, {
-      withCredentials: true
-    });
+  getSalesChartData(days: number): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(`${this.apiUrl}/dashboard/sales/chart?days=${days}`);
   }
-
-  // Sales Chart Data
-  getSalesChartData(days: number = 7): Observable<ApiResponse<any>> {
-    return this.http.get<ApiResponse<any>>(`${this.apiUrl}/dashboard/sales-chart?days=${days}`, {
-      withCredentials: true
-    });
-  }
+  createCategory(category: any): Observable<ApiResponse<CategoryResponseDTO>> {
+  return this.http.post<ApiResponse<CategoryResponseDTO>>(`${this.apiUrl}/categories`, category, {
+    withCredentials: true
+  });
+}
+getCategories(): Observable<ApiResponse<CategoryResponseDTO[]>> {
+  return this.http.get<ApiResponse<CategoryResponseDTO[]>>(`${this.apiUrl}/categories`, {
+    withCredentials: true
+  });
+}
 }

@@ -1,30 +1,45 @@
 <div class="products-section">
   <div class="section-header">
-    <h2>Product Management</h2>
+    <div class="header-left">
+      <h2>Product Management</h2>
+      <p>Manage your product inventory and catalog</p>
+    </div>
     <button class="create-btn" (click)="openModal()">+ Add Product</button>
   </div>
 
   <div class="filters-bar">
-  <div class="search-wrapper">
-    <span class="search-icon">🔍</span>
-    <input
-      [(ngModel)]="search"
-      (input)="onSearch()"
-      placeholder="Search by name, SKU or category..."
-      class="search-input"
-    />
-  </div>
+    <div class="search-wrapper">
+      <span class="search-icon">🔍</span>
+      <input
+        [(ngModel)]="search"
+        (input)="onSearch()"
+        placeholder="Search by name, SKU or category..."
+        class="search-input"
+      />
+    </div>
 
-  <div class="filter-wrapper">
-    <label>Category:</label>
-    <select [(ngModel)]="categoryFilter" (change)="onCategoryFilterChange()" class="category-filter">
-      <option value="all">All Categories</option>
-      <option *ngFor="let cat of categories" [value]="cat.name">
-        {{cat.name}}
-      </option>
-    </select>
+    <div class="filter-wrapper">
+      <label>Category:</label>
+      <select [(ngModel)]="categoryFilter" (change)="onCategoryFilterChange()" class="category-filter">
+        <option value="all">All Categories</option>
+        <option *ngFor="let cat of categories" [value]="cat.name">
+          {{cat.name}}
+        </option>
+      </select>
+    </div>
+
+    <!-- Thêm filter theo status -->
+    <div class="filter-wrapper">
+      <label>Status:</label>
+      <select [(ngModel)]="statusFilter" (change)="onStatusFilterChange()" class="status-filter">
+        <option value="all">All Status</option>
+        <option value="ACTIVE">Active</option>
+        <option value="INACTIVE">Inactive</option>
+        <option value="OUT_OF_STOCK">Out of Stock</option>
+        <option value="DELETED">Deleted</option>
+      </select>
+    </div>
   </div>
-</div>
 
   <div class="loading-overlay" *ngIf="loading">
     <div class="spinner"></div>
@@ -47,25 +62,39 @@
       <tbody>
         <tr *ngFor="let product of paginated">
           <td class="product-sku">{{product.sku}}</td>
-          <td class="product-name">{{product.name}}</td>
+          <td class="product-name">
+            {{product.name}}
+            <span *ngIf="product.deleted" class="deleted-badge">Deleted</span>
+          </td>
           <td>{{product.categoryName}}</td>
           <td>{{product.unitName}}</td>
           <td class="product-price">{{formatCurrency(product.salePrice)}}</td>
-          <td [class.low-stock]="product.quantity < 10">
+          <td [class.low-stock]="product.quantity < 10 && !product.deleted">
             {{product.quantity}}
-            <span *ngIf="product.quantity < 10" class="warning-icon">⚠️</span>
+            <span *ngIf="product.quantity < 10 && !product.deleted" class="warning-icon">⚠️</span>
           </td>
           <td>
             <span class="status-badge" [ngClass]="getStatusClass(product.status)">
-              {{product.status}}
+              {{getStatusText(product.status)}}
             </span>
           </td>
           <td class="actions">
-            <button class="action-btn edit" (click)="openModal(product)" title="Edit Product">
+            <button class="action-btn edit" (click)="openModal(product)"
+                    [disabled]="product.status === 'DELETED'"
+                    title="Edit Product">
               <span>✏️</span>
             </button>
-            <button class="action-btn delete" (click)="deleteProduct(product.id)" title="Delete Product">
+            <button class="action-btn delete"
+                    *ngIf="product.status !== 'DELETED'"
+                    (click)="deleteProduct(product.id)"
+                    title="Delete Product">
               <span>🗑️</span>
+            </button>
+            <button class="action-btn restore"
+                    *ngIf="product.status === 'DELETED'"
+                    (click)="confirmRestore(product)"
+                    title="Restore Product">
+              <span>↩️ Restore</span>
             </button>
           </td>
         </tr>
@@ -101,61 +130,139 @@
   </div>
 </div>
 
-<!-- MODAL -->
-<div class="modal" *ngIf="showModal" (click)="showModal = false">
+<!-- Product Modal -->
+<!-- Product Modal -->
+<div class="modal" *ngIf="showModal" (click)="closeModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <h3>{{ editingProduct ? 'Edit Product' : 'Add New Product' }}</h3>
 
     <div class="form-group">
       <label>SKU *</label>
-      <input [(ngModel)]="productForm.sku" placeholder="Enter product SKU" />
+      <input [(ngModel)]="productForm.sku" placeholder="Enter product SKU"
+             [disabled]="editingProduct?.status === 'DELETED'" />
     </div>
 
     <div class="form-group">
       <label>Product Name *</label>
-      <input [(ngModel)]="productForm.name" placeholder="Enter product name" />
+      <input [(ngModel)]="productForm.name" placeholder="Enter product name"
+             [disabled]="editingProduct?.status === 'DELETED'" />
     </div>
 
     <div class="form-group">
       <label>Description</label>
-      <textarea [(ngModel)]="productForm.description" rows="3" placeholder="Enter product description"></textarea>
+      <textarea [(ngModel)]="productForm.description" rows="3"
+                placeholder="Enter product description"
+                [disabled]="editingProduct?.status === 'DELETED'"></textarea>
     </div>
 
     <div class="form-row">
+      <div class="form-group">
+        <label>Import Price</label>
+        <input type="number" [(ngModel)]="productForm.importPrice"
+               placeholder="0" [disabled]="editingProduct?.status === 'DELETED'" />
+      </div>
+
       <div class="form-group">
         <label>Sale Price *</label>
-        <input type="number" [(ngModel)]="productForm.salePrice" placeholder="0" />
-      </div>
-
-      <div class="form-group">
-        <label>Quantity *</label>
-        <input type="number" [(ngModel)]="productForm.quantity" placeholder="0" />
+        <input type="number" [(ngModel)]="productForm.salePrice"
+               placeholder="0" [disabled]="editingProduct?.status === 'DELETED'" />
       </div>
     </div>
 
+    <!-- Trong modal, thay phần category bằng đoạn này -->
+<div class="form-row">
+  <div class="form-group">
+    <label>Quantity *</label>
+    <input type="number" [(ngModel)]="productForm.quantity"
+           placeholder="0" [disabled]="editingProduct?.status === 'DELETED'" />
+  </div>
+
+  <div class="form-group">
+    <label>Category *</label>
+    <div class="category-wrapper" clickOutside (clickOutside)="closeCategoryDropdown()">
+      <input
+        type="text"
+        [(ngModel)]="categoryInput"
+        (input)="onCategoryInput()"
+        (focus)="openCategoryDropdown()"
+        placeholder="Type or select category"
+        class="category-input"
+        [disabled]="editingProduct?.status === 'DELETED'"
+        autocomplete="off"
+      />
+      <button
+        type="button"
+        class="dropdown-icon"
+        (click)="toggleCategoryDropdown($event)"
+        [disabled]="editingProduct?.status === 'DELETED'"
+      >
+        ▼
+      </button>
+      <div class="category-dropdown" *ngIf="showCategoryDropdown">
+        <div
+          *ngFor="let cat of filteredCategories"
+          class="category-option"
+          (click)="selectCategory(cat)"
+        >
+          {{ cat.name }}
+        </div>
+        <div *ngIf="filteredCategories.length === 0" class="category-option empty">
+          No categories found
+        </div>
+      </div>
+    </div>
+    <small class="hint-text">
+      💡 Type to search or click the dropdown icon to select from list.
+    </small>
+  </div>
+</div>
     <div class="form-row">
       <div class="form-group">
-        <label>Category</label>
-        <select [(ngModel)]="productForm.categoryId">
-          <option [value]="null">Select Category</option>
-          <option *ngFor="let cat of categories" [value]="cat.id">
-            {{cat.name}}
-          </option>
+        <label>Unit</label>
+        <select [(ngModel)]="productForm.unitId"
+                [disabled]="editingProduct?.status === 'DELETED'">
+          <option [value]="1">Piece</option>
+          <option [value]="2">Box</option>
+          <option [value]="3">Set</option>
         </select>
       </div>
 
       <div class="form-group">
         <label>Status</label>
-        <select [(ngModel)]="productForm.status">
+        <select [(ngModel)]="productForm.status"
+                [disabled]="editingProduct?.status === 'DELETED'">
           <option value="ACTIVE">Active</option>
           <option value="INACTIVE">Inactive</option>
+          <option value="OUT_OF_STOCK">Out of Stock</option>
+          <option value="DELETED" [disabled]="true" *ngIf="editingProduct?.status === 'DELETED'">
+            Deleted (Cannot change)
+          </option>
         </select>
+        <small *ngIf="editingProduct?.status === 'DELETED'" class="warning-text">
+          ⚠️ This product is deleted. Please restore it to make changes.
+        </small>
       </div>
     </div>
 
     <div class="modal-actions">
-      <button class="save-btn" (click)="saveProduct()">Save</button>
-      <button class="cancel-btn" (click)="showModal = false">Cancel</button>
+      <button class="save-btn" (click)="saveProduct()"
+              [disabled]="editingProduct?.status === 'DELETED'">
+        Save
+      </button>
+      <button class="cancel-btn" (click)="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Restore Confirmation Modal -->
+<div class="modal" *ngIf="showRestoreConfirm" (click)="showRestoreConfirm = false">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h3>Confirm Restore</h3>
+    <p>Are you sure you want to restore product "{{productToRestore?.name}}"?</p>
+    <p class="warning-text">This will set the product status back to ACTIVE.</p>
+    <div class="modal-actions">
+      <button class="save-btn" (click)="restoreProduct()">Restore</button>
+      <button class="cancel-btn" (click)="showRestoreConfirm = false">Cancel</button>
     </div>
   </div>
 </div>

@@ -26,7 +26,11 @@ public class ProductController {
 
         return ResponseEntity.ok(productService.createProduct(dto));
     }
-
+    @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<List<ProductResponseDTO>>> getAllProductsIncludingDeleted() {
+        return ResponseEntity.ok(productService.getAllProductsIncludingDeleted());
+    }
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<ProductResponseDTO>> updateProduct(
@@ -35,7 +39,16 @@ public class ProductController {
 
         return ResponseEntity.ok(productService.updateProduct(id, dto));
     }
-
+    @PutMapping("/{id}/restore")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> restoreProduct(@PathVariable Long id) {
+        return ResponseEntity.ok(productService.restoreProduct(id));
+    }
+    @DeleteMapping("/{id}/permanent")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> permanentlyDeleteProduct(@PathVariable Long id) {
+        return ResponseEntity.ok(productService.permanentlyDeleteProduct(id));
+    }
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ProductResponseDTO>> getProductById(
             @PathVariable Long id) {

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -90,5 +91,21 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
                 "LEFT JOIN FETCH i.product p " +
                 "ORDER BY o.orderDate DESC")
         List<Order> findAllOrdersWithItems(Pageable pageable);
-    }
+
+    // Tính doanh thu theo ngày
+    @Query("SELECT SUM(o.finalAmount) FROM Order o WHERE DATE(o.orderDate) = :date AND o.orderStatus = 'COMPLETED'")
+    Double getTotalRevenueByDate(@Param("date") LocalDate date);
+
+
+    // Lấy doanh thu theo tháng (từ ngày bắt đầu)
+    @Query("SELECT YEAR(o.orderDate), MONTH(o.orderDate), SUM(o.finalAmount) " +
+            "FROM Order o " +
+            "WHERE o.orderDate >= :startDate AND o.orderStatus = 'COMPLETED' " +
+            "GROUP BY YEAR(o.orderDate), MONTH(o.orderDate) " +
+            "ORDER BY YEAR(o.orderDate) ASC, MONTH(o.orderDate) ASC")
+    List<Object[]> getMonthlySales(@Param("startDate") LocalDateTime startDate);
+    // Đếm số đơn hàng trong ngày
+    @Query("SELECT COUNT(o) FROM Order o WHERE DATE(o.orderDate) = :date")
+    int countByOrderDate(@Param("date") LocalDate date);
+}
 

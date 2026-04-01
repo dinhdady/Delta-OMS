@@ -1,3 +1,5 @@
+// src/app/features/dashboard/dashboard-overview/dashboard-overview.component.ts
+
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
@@ -52,8 +54,14 @@ export class DashboardOverviewComponent implements OnInit, AfterViewInit {
     // Load statistics
     this.dashboardService.getStatistics().subscribe({
       next: (res: any) => {
+        console.log('Statistics response:', res);
+        // API trả về: { status, message, data }
         if (res && res.data) {
           this.stats = res.data;
+        }
+        // Nếu res trực tiếp là object chứa data
+        else if (res && !res.status) {
+          this.stats = res;
         }
       },
       error: (err: any) => {
@@ -64,21 +72,39 @@ export class DashboardOverviewComponent implements OnInit, AfterViewInit {
     // Load recent orders
     this.dashboardService.getRecentOrders(5).subscribe({
       next: (res: any) => {
-        this.recentOrders = res.data || [];
+        console.log('Recent orders response:', res);
+        // API trả về: { status, message, data }
+        if (res && res.data) {
+          this.recentOrders = res.data;
+        } else if (res && Array.isArray(res)) {
+          this.recentOrders = res;
+        } else {
+          this.recentOrders = [];
+        }
       },
       error: (err: any) => {
         console.error('Error loading recent orders:', err);
+        this.recentOrders = [];
       }
     });
 
     // Load top products
     this.dashboardService.getTopProducts(5).subscribe({
       next: (res: any) => {
-        this.topProducts = res.data || [];
+        console.log('Top products response:', res);
+        // API trả về: { status, message, data }
+        if (res && res.data) {
+          this.topProducts = res.data;
+        } else if (res && Array.isArray(res)) {
+          this.topProducts = res;
+        } else {
+          this.topProducts = [];
+        }
         this.loading = false;
       },
       error: (err: any) => {
         console.error('Error loading top products:', err);
+        this.topProducts = [];
         this.loading = false;
       }
     });
@@ -87,30 +113,49 @@ export class DashboardOverviewComponent implements OnInit, AfterViewInit {
   loadSalesChart() {
     this.dashboardService.getSalesChartData(this.chartDays).subscribe({
       next: (res: any) => {
-        const data = res.data || {
-          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-          orders: [65, 72, 88, 95, 102, 88, 76],
-          revenue: [450, 520, 680, 750, 890, 720, 580]
-        };
-        this.initChart(data.labels, data.orders, data.revenue);
+        console.log('Chart data response:', res);
+
+        // API trả về: { status, message, data: { months, revenues } }
+        if (res && res.data) {
+          const data = res.data;
+          // Dữ liệu từ API: months và revenues
+          if (data.months && data.revenues) {
+            this.initChart(data.months, data.revenues);
+          }
+          // Fallback nếu có cấu trúc khác
+          else if (data.labels && data.orders) {
+            this.initChart(data.labels, data.revenue || data.orders);
+          }
+          else {
+            // Dữ liệu mẫu fallback
+            this.initChartWithFallback();
+          }
+        } else {
+          this.initChartWithFallback();
+        }
       },
       error: (err: any) => {
         console.error('Error loading chart data:', err);
-        this.initChart(
-          ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-          [65, 72, 88, 95, 102, 88, 76],
-          [450, 520, 680, 750, 890, 720, 580]
-        );
+        this.initChartWithFallback();
       }
     });
   }
 
+  initChartWithFallback() {
+    // Dữ liệu mẫu theo tháng
+    this.initChart(
+      ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
+       'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+      [65, 72, 88, 95, 102, 88, 76, 95, 110, 125, 140, 135]
+    );
+  }
+
   onChartFilterChange(days: string) {
-    this.chartDays = parseInt(days);
+    this.chartDays = parseInt(days, 10);
     this.loadSalesChart();
   }
 
-  initChart(labels: string[], ordersData: number[], revenueData: number[]) {
+  initChart(labels: string[], revenueData: number[]) {
     const canvas = document.getElementById('salesChart') as HTMLCanvasElement;
     if (!canvas) return;
 
@@ -124,22 +169,13 @@ export class DashboardOverviewComponent implements OnInit, AfterViewInit {
         labels: labels,
         datasets: [
           {
-            label: 'Orders',
-            data: ordersData,
-            borderColor: '#667eea',
-            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+            label: 'Doanh thu (VNĐ)',
+            data: revenueData,
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
             tension: 0.4,
             fill: true,
             yAxisID: 'y'
-          },
-          {
-            label: 'Revenue ($)',
-            data: revenueData,
-            borderColor: '#f093fb',
-            backgroundColor: 'rgba(240, 147, 251, 0.1)',
-            tension: 0.4,
-            fill: true,
-            yAxisID: 'y1'
           }
         ]
       },
@@ -163,11 +199,10 @@ export class DashboardOverviewComponent implements OnInit, AfterViewInit {
                 }
                 const yValue = context.parsed.y;
                 if (yValue !== null && yValue !== undefined) {
-                  if (context.dataset.label?.includes('Revenue')) {
-                    label += '$' + yValue.toLocaleString();
-                  } else {
-                    label += yValue;
-                  }
+                  label += new Intl.NumberFormat('vi-VN', {
+                    style: 'currency',
+                    currency: 'VND'
+                  }).format(yValue);
                 }
                 return label;
               }
@@ -181,33 +216,30 @@ export class DashboardOverviewComponent implements OnInit, AfterViewInit {
             position: 'left',
             title: {
               display: true,
-              text: 'Orders'
+              text: 'Doanh thu (VNĐ)'
             },
-            beginAtZero: true
-          },
-          y1: {
-            type: 'linear',
-            display: true,
-            position: 'right',
-            title: {
-              display: true,
-              text: 'Revenue ($)'
-            },
-            grid: {
-              drawOnChartArea: false,
-            },
-            beginAtZero: true
-          },
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                return new Intl.NumberFormat('vi-VN', {
+                  style: 'currency',
+                  currency: 'VND',
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0
+                }).format(value as number);
+              }
+            }
+          }
         }
       }
     });
   }
 
   formatCurrency(amount: number): string {
-    if (!amount) return '$0';
-    return new Intl.NumberFormat('en-US', {
+    if (!amount && amount !== 0) return '₫0';
+    return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'VND',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(amount);
@@ -229,12 +261,7 @@ export class DashboardOverviewComponent implements OnInit, AfterViewInit {
   }
 
   viewOrder(order: any) {
-    alert(`Order Details:
-Order Code: ${order.orderCode}
-Customer: ${order.customerName}
-Date: ${new Date(order.orderDate).toLocaleDateString()}
-Total: ${this.formatCurrency(order.finalAmount)}
-Status: ${order.orderStatus}
-Payment Status: ${order.paymentStatus}`);
+    // Điều hướng đến trang orders và có thể truyền ID để xem chi tiết
+    this.router.navigate(['/dashboard/orders'], { queryParams: { id: order.id } });
   }
 }

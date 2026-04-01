@@ -1,5 +1,6 @@
 package com.project.management_system.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,19 +30,38 @@ public class Product {
     private BigDecimal importPrice;
     private BigDecimal salePrice;
     private int quantity;
-    private String status;
+
+    @Enumerated(EnumType.STRING)
+    private ProductStatus status;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "unit_id")
     private Unit unit;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "product")
     private List<OrderItem> orderItems;
 
     private LocalDateTime createdAt = LocalDateTime.now();
+    // Thêm field mới
+    @Column(nullable = false)
+    private boolean deleted = false;
+
+    // Thêm field để lưu thời gian xóa (tùy chọn)
+    private LocalDateTime deletedAt;
+
+    // Thêm field để lưu người xóa (tùy chọn)
+    private String deletedBy;
+    public enum ProductStatus {
+        ACTIVE,
+        INACTIVE,
+        OUT_OF_STOCK,
+        DELETED  // Thêm status mới
+    }
 }
 
